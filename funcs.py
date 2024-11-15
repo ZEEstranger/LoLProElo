@@ -62,17 +62,21 @@ def team_dict_build(team_rating_list:list) -> dict:
     return team_dict
 
 def df_to_excel(file_name, df:pd.DataFrame):
-    
     df.to_excel(file_name)
 
-if __name__ == '__main__':
-
+def tournament_processing(
+    team_rating_excel: str,
+    team_rating_sheet: str,
+    tournament_excel: str,
+    tournament_sheet: str,
+):
+    
     # Словарь команд
-    team_dict = team_dict_build(excel_import('team_rating.xlsx', 'Team Active Elo 2010'))
+    team_dict = team_dict_build(excel_import(team_rating_excel, team_rating_sheet))
 
     print(team_dict)
 
-    match_history = excel_import('LoL_Event_Cycle_2010.xlsx', 'ESL Major Series 7')
+    match_history = excel_import(tournament_excel, tournament_sheet)
 
     for match in match_history:
         for game in str(match[2]):
@@ -89,7 +93,36 @@ if __name__ == '__main__':
     s = pd.DataFrame.from_dict(team_dict).T
 
     print(s)
-    s.to_excel("output.xlsx", index=True, index_label="Team Name")
+    s.to_excel("output.xlsx")
 
-    # for team in team_dict:
-        # print(team_dict[team])
+
+def team_sort(team_rating_excel, team_rating_sheet):
+    team_df = pd.read_excel(team_rating_excel, sheet_name=team_rating_sheet)
+
+    team_df.sort_values(by=['Region', 'Team'], inplace=True)
+    # team_df.insert(0, 'id', range(1, len(team_df) + 1))
+    team_df.to_excel("output_sorted_teams.xlsx")
+
+    print("Sorting is done")
+
+
+if __name__ == '__main__':
+
+    key = 'run'
+    # key = 'sort'
+
+    if key == 'run':
+        tournament_processing(
+            team_rating_excel = 'team_rating.xlsx',
+            team_rating_sheet = 'Team Active Elo 2011',
+            tournament_excel = 'LoL_Event_Cycle_2011.xlsx',
+            tournament_sheet = 'IEM Season 6 Cologne',
+        )
+
+    elif key == 'sort':
+        team_sort(
+            team_rating_excel = 'team_rating.xlsx',
+            team_rating_sheet = 'Team Active Elo 2011',
+        )
+
+
